@@ -34,8 +34,8 @@ function [O23,O34,O35,O46] = pq (O22, l_buff, p_buff, device)
         total_stall_len = sum(w_stall);
 
         % # calculate average stalling interval
-        avg_stall_interval = 0
-        num_stalls = length(l_buff)
+        avg_stall_interval = 0;
+        num_stalls = length(l_buff);
         if num_stalls > 1
           for i=2:length(p_buff)
             sum_stall = sum(p_buff(i) - p_buff(i-1));
@@ -45,15 +45,15 @@ function [O23,O34,O35,O46] = pq (O22, l_buff, p_buff, device)
         %
         % # ---------------------------------------------------------------------
         % # Clause 8.1.2.2
-        vid_qual_spread = max(O22) - min(O22)
+        vid_qual_spread = max(O22) - min(O22);
         %
         % # ---------------------------------------------------------------------
         % # Clause 8.1.2.3
         vid_qual_change_rate = double(0);
         for i = 2:duration
-            diff = O22(i) - O22(i-1)
+            diff = O22(i) - O22(i-1);
             if (diff > 0.2 | diff < -0.2)
-                vid_qual_change_rate += 1
+                vid_qual_change_rate += 1;
               end
             end
         vid_qual_change_rate = vid_qual_change_rate / duration;
@@ -85,7 +85,7 @@ function [O23,O34,O35,O46] = pq (O22, l_buff, p_buff, device)
               end
             end
 
-        lens = []
+        lens = [];
         for i=1:length(QC)
           index = i;
           val = QC(i);
@@ -98,6 +98,7 @@ function [O23,O34,O35,O46] = pq (O22, l_buff, p_buff, device)
                 end
               end
         if lens
+          %%%%%%%need to have a look
             lens.insert(0, [0, 0]);
             lens.append([length(QC), 0]);
             for i =2:length(lens)
@@ -142,64 +143,57 @@ function [O23,O34,O35,O46] = pq (O22, l_buff, p_buff, device)
         c2 = 7.85416481;
         c23 = 0.01853820;
         O34_diff = list(O34);
-        for i in range(duration)
+        for i = 1:duration
             # Eq. 5
-            w_diff = utils.exponential(1, c1, 0, c2, duration-i-1)
-            O34_diff[i] = (O34[i] - O35_baseline) * w_diff
+            w_diff = exponential(1, c1, 0, c2, duration-i-1);
+            O34_diff(i) = (O34(i) - O35_baseline) * w_diff;
 
         # Eq. 6
-        neg_perc = np.percentile(O34_diff, 10, interpolation='linear')
+        neg_perc = prctile(O34_diff, 10);
         # Eq. 7
-        negative_bias = np.maximum(0, -neg_perc) * c23
+        negative_bias = max(0, -neg_perc) * c23;
 
         # ---------------------------------------------------------------------
         # Eq. 29
-        s1 = 9.35158684
-        s2 = 0.91890815
-        s3 = 11.0567558
-        stalling_impact = np.exp(- num_stalls / s1) * \
-            np.exp(- total_stall_len / duration / s2) * \
-            np.exp(- avg_stall_interval / duration / s3)
+        s1 = 9.35158684;
+        s2 = 0.91890815;
+        s3 = 11.0567558;
+        stalling_impact = exp(- num_stalls / s1) * \
+            exp(- total_stall_len / duration / s2) * \
+            exp(- avg_stall_interval / duration / s3);
         # Eq. 31
-        O23 = 1 + 4 * stalling_impact
+        O23 = 1 + 4 * stalling_impact;
 
         # ---------------------------------------------------------------------
         # Clause 8.3
 
         # Eq. 24
-        osc_comp = 0
-        comp1 = 0.67756080
-        comp2 = -8.05533303
-        osc_test = ((q_dir_changes_longest / duration) < 0.25) and (q_dir_changes_longest < 30)
-        if osc_test:
+        osc_comp = 0;
+        comp1 = 0.67756080;
+        comp2 = -8.05533303;
+        osc_test = ((q_dir_changes_longest / duration) < 0.25) and (q_dir_changes_longest < 30);
+        if osc_test
             # Eq. 27
-            q_diff = np.maximum(0.0, 1 + np.log10(vid_qual_spread + 0.001))
+            q_diff = max(0.0, 1 + log10(vid_qual_spread + 0.001));
             # Eq. 23
-            osc_comp = np.maximum(0.0, np.minimum(q_diff * np.exp(comp1 * q_dir_changes_tot + comp2), 1.5))
-
+            osc_comp = max(0.0, min(q_diff * exp(comp1 * q_dir_changes_tot + comp2), 1.5));
+          end
         # Eq. 26
-        adapt_comp = 0
-        comp3 = 0.17332553
-        comp4 = -0.01035647
-        adapt_test = (q_dir_changes_longest / duration) < 0.25
-        if adapt_test:
-            adapt_comp = np.maximum(0.0, np.minimum(comp3 * vid_qual_spread * vid_qual_change_rate + comp4, 0.5))
-
+        adapt_comp = 0;
+        comp3 = 0.17332553;
+        comp4 = -0.01035647;
+        adapt_test = (q_dir_changes_longest / duration) < 0.25;
+        if adapt_test
+            adapt_comp = max(0.0, min(comp3 * vid_qual_spread * vid_qual_change_rate + comp4, 0.5));
+          end
         # Eq. 18
-        O35 = O35_baseline - negative_bias - osc_comp - adapt_comp
+        O35 = O35_baseline - negative_bias - osc_comp - adapt_comp;
 
         # ---------------------------------------------------------------------
         # Eq. 28
-        mos = 1.0 + (O35 - 1.0) * stalling_impact
+        mos = 1.0 + (O35 - 1.0) * stalling_impact;
 
         # ---------------------------------------------------------------------
         # Eq. 28
-        rf_score = rfmodel.calculate(self.O21, self.O22, self.l_buff, self.p_buff, duration)
-        O46 = 0.75 * np.maximum(np.minimum(mos, 5), 1) + 0.25 * rf_score
-
-        return {
-            "O23": O23,
-            "O34": O34.tolist(),
-            "O35": float(O35),
-            "O46": float(O46)
-        }
+        rf_score = rfmodel.calculate(O21, O22, l_buff, p_buff, duration);
+        O46 = 0.75 * max(min(mos, 5), 1) + 0.25 * rf_score;
