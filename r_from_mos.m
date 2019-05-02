@@ -12,7 +12,7 @@ function Q = r_from_mos(MOS)
 
     if ismember(MOS,R_FROM_MOS_KEYS)
         Q = R_FROM_MOS_VALUES(find(R_FROM_MOS_KEYS==1.0500));
-    else:
-        Q = interp1(MOS, R_FROM_MOS_KEYS, R_FROM_MOS_VALUES);
+    else
+        Q = interp1(R_FROM_MOS_KEYS, R_FROM_MOS_VALUES, MOS);
     end
   end

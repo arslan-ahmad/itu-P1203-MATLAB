@@ -1,4 +1,4 @@
-function y= constrain(x, minimum=0.0, maximum=100.0):
+function y= constrain(x, minimum, maximum)
     % """
     % Constrain a vector input x between a certain minimum and maximum
     % """

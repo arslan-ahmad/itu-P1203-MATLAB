@@ -8,5 +8,5 @@ function y = exponential(a, b, c, d, x)
     %                 d: defines slope of the curve
     % Visualization at: https://www.desmos.com/calculator/xsy2xdqmuo
     % """
-    y = b + (a - b) * np.exp(-(x - c) * np.log(0.5) / (-(d - c)));
+    y = b + (a - b) * exp(-(x - c) * log(0.5) / (-(d - c)));
   end 

@@ -9,5 +9,5 @@ function deg_frame_rate_v = degradation_due_to_frame_rate_reduction(deg_cod_v, d
     if framerate < 24
         deg_frame_rate_v = (100 - deg_cod_v - deg_scal_v) * (t1 - t2 * framerate) / (t3 + framerate);
     end
-    deg_frame_rate_v = constrain(deg_frame_rate_v, 0.0, 100.0);
+    deg_frame_rate_v = constrain(deg_frame_rate_v, 0, 100);
   end

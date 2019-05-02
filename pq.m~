@@ -141,7 +141,7 @@ function [O23,O34,O35,O46] = pq (O22, l_buff, p_buff, device)
             w2 = t4 - t5 * temp;
 
             O35_numerator = O35_numerator + w1 * w2 * temp;
-            O35_denominator = O35_denominator + w1 * w2;
+            O35_denominator = O35__denominator + w1 * w2;
         end
         O35_baseline = O35_numerator / O35_denominator;
         % Done Arslan
